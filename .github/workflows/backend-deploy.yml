@@ -18,10 +18,12 @@ jobs:
           distribution: temurin
 
       - name: Build project
-        run: mvn clean package -DskipTests
+        run: |
+          cd backend
+          mvn clean package -DskipTests
 
       - name: Deploy to Azure
         uses: azure/webapps-deploy@v3
         with:
           app-name: expense-tracker-api-bophelo
-          package: target/*.jar
+          package: backend/target/*.jar
