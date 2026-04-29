@@ -14,16 +14,14 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
-          java-version: 21
+          java-version: '17'
           distribution: temurin
 
-      - name: Build
-        run: |
-          cd backend
-          mvn clean package -DskipTests
+      - name: Build project
+        run: mvn clean package -DskipTests
 
-      - name: Deploy to Azure Web App
+      - name: Deploy to Azure
         uses: azure/webapps-deploy@v3
         with:
           app-name: expense-tracker-api-bophelo
-          package: backend/target/*.jar
+          package: target/*.jar
