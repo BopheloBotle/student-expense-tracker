@@ -1,25 +1,23 @@
-name: Deploy Spring Boot Backend to Azure
+name: Deploy Backend
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
-          distribution: 'temurin'
+          java-version: 21
+          distribution: temurin
 
-      - name: Build with Maven
+      - name: Build
         run: |
           cd backend
           mvn clean package -DskipTests
@@ -28,5 +26,4 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: expense-tracker-api-bophelo
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           package: backend/target/*.jar
