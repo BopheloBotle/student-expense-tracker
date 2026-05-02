@@ -1,6 +1,7 @@
 package com.student.expensetracker.security;
 
 import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -11,9 +12,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -44,17 +45,15 @@ public class SecurityConfig {
 
         http.cors(Customizer.withDefaults());
 
-        // 401 for missing/invalid auth (clearer than 403 for API clients)
-        http.exceptionHandling(ex -> ex.authenticationEntryPoint(jsonUnauthorizedEntryPoint()));
+        http.exceptionHandling(ex ->
+                ex.authenticationEntryPoint(jsonUnauthorizedEntryPoint()));
 
         http.authorizeHttpRequests(auth -> auth
-        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-        .requestMatchers("/api/auth/**").permitAll()
-        .requestMatchers("/actuator/health").permitAll()
-        .anyRequest().authenticated()
-);
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/actuator/health").permitAll()
+                .anyRequest().authenticated());
 
-        // IMPORTANT: filters (order matters)
         http.addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -76,13 +75,10 @@ public class SecurityConfig {
 
         config.setAllowCredentials(true);
 
-        // Vite dev/preview (any port), IPv6 loopback, common LAN dev origins
-        config.setAllowedOriginPatterns(
-                List.of(
-                        "http://localhost:*",
-                        "http://127.0.0.1:*",
-                        "http://[::1]:*",
-                        "http://192.168.*:*"));
+        config.setAllowedOriginPatterns(List.of(
+                "http://localhost:*",
+                "http://127.0.0.1:*"
+        ));
 
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
